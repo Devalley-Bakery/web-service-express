@@ -2,7 +2,7 @@
 
 Este é um sistema de gerenciamento interno para uma padaria, desenvolvido com **Node.js** e **Express**. O sistema permite que os funcionários gerenciem pedidos, controlem o estoque e visualizem relatórios detalhados, otimizando as operações internas.
 
-## Funcionalidades
+### Funcionalidades
 
 - Gerenciamento de pedidos: Criação, atualização e visualização de pedidos.
 - Controle de estoque: Gerenciar quantidade e preços dos produtos.
