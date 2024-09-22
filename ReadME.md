@@ -1,5 +1,10 @@
 # Bakery Management System
 
+<p align="center">
+   <img src="http://img.shields.io/static/v1?label=STATUS&message=EM%20DESENVOLVIMENTO&color=RED&style=for-the-badge" #vitrinedev/>
+</p>
+
+
 Este é um sistema de gerenciamento interno para uma padaria, desenvolvido com **Node.js** e **Express**. O sistema permite que os funcionários gerenciem pedidos, controlem o estoque e visualizem relatórios detalhados, otimizando as operações internas.
 
 
