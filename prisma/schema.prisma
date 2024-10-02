@@ -66,4 +66,5 @@ enum Role {
 enum OrderStatus {
   in_progress
   completed
+  canceled
 }
