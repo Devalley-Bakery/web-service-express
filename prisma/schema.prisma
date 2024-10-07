@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://USERNAME:PASSWORD@HOST:PORT/DATABASE"
+}
+
+model Product {
+  id            Int      @id @default(autoincrement())
+  name          String   @db.VarChar(100)
+  price         Decimal  @db.Decimal(10, 2)
+  type          ProductType
+  stockQuantity Int
+  imagePath     String?  @db.VarChar(255)
+  orderProducts OrderProduct[]
+}
+
+model Employee {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(100)
+  role Role
+  orders Orders[]
+}
+
+model Orders {
+  id          Int          @id @default(autoincrement())
+  status      OrderStatus
+  total       Decimal       @db.Decimal(10, 2)
+  employeeId  Int
+  orderDate   DateTime      @default(now()) @db.Timestamp(0)
+  employee    Employee      @relation(fields: [employeeId], references: [id])
+  products    OrderProduct[]
+}
+
+model OrderProduct {
+  orderId   Int
+  productId Int
+  quantity  Int
+
+  order   Orders  @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@id([orderId, productId])
+}
+
+enum ProductType {
+  food
+  drink
+  dessert
+}
+
+enum Role {
+  attendant
+  manager
+  baker
+}
+
+enum OrderStatus {
+  in_progress
+  completed
+  canceled
+}
