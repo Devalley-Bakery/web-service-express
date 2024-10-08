@@ -30,7 +30,7 @@ export async function getProducts(req, res) {
     }
 }
 
-export async function getProductById(res, req) {
+export async function getProductById(req, res) {
     try {
         const { id } = req.params;
         const product = await productService.getProductById(id)
