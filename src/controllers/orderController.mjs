@@ -20,10 +20,13 @@ export async function getOrderById(req, res) {
   }
 }
 
+
+//Exemplo de requisição:
+// http://localhost:3000/orders?active=true
 export async function getOrderByStatus(req, res) {
   try {
-    const { boolean } = req.params;
-    const order = await orderService.getOrderByStatus(boolean);
+    const { active } = req.query;
+    const order = await orderService.getOrderByStatus(active);
     res.status(200).json(order);
   } catch (error) {
     res.status(500).json({ error: error.message });

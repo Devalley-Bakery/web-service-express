@@ -92,9 +92,11 @@ export async function getOrderById(id) {
   return orderDetails;
 }
 
-export async function getOrderByStatus(status) {
+export async function getOrderByStatus(active) {
+  const isActive = active === true ? "in_progress" : 'completed' 
+  
   const orders = await prisma.orders.findMany({
-    where: { status: status },
+    where: {status: 'completed'},
     include: {
       products: {
         include: {
@@ -109,9 +111,12 @@ export async function getOrderByStatus(status) {
     },
   });
 
-  if (orders.length === 0) {
-    return resizeBy.status(404).json({ error: "No orders found." });
+  console.log(active ? 'in_progress' : 'completed', orders )
+  if (orders.length === 0|| !orders) {
+    return resizeBy.status(404).json({ error: "Order not found." });
   }
+
+ return orders
 
   const orderDetails = orders.map((order) => ({
     id: order.id,
