@@ -25,8 +25,21 @@ export async function getOrderById(req, res) {
 // http://localhost:3000/orders?active=true
 export async function getOrderByStatus(req, res) {
   try {
-    const { active } = req.query;
-    const order = await orderService.getOrderByStatus(active);
+    const { status } = req.query;
+    const order = await orderService.getOrderByStatus(status);
+    res.status(200).json(order);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+export async function updateOrder(req, res) {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    
+    const order = await orderService.updateOrder(id, status);
+
     res.status(200).json(order);
   } catch (error) {
     res.status(500).json({ error: error.message });

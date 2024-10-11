@@ -9,22 +9,22 @@ async function main() {
         name: "Croassaint de Frango",
         price: 8.5,
         type: "food",
-        stockQuantity: 15,
-        imagePath: "/uploads/croassaint.jpg",
+        stock_quantity: 15, // altere para stock_quantity
+        image_path: "/uploads/croassaint.jpg",
       },
       {
         name: "Bolo de Cenoura",
         price: 15.0,
         type: "dessert",
-        stockQuantity: 10,
-        imagePath: "/carrot_cake.jpg",
+        stock_quantity: 10, // altere para stock_quantity
+        image_path: "/carrot_cake.jpg",
       },
       {
-        name: "Suco de Moranho",
+        name: "Suco de Morango",
         price: 7.0,
         type: "drink",
-        stockQuantity: 20,
-        imagePath: "strawberry_juice.jpg",
+        stock_quantity: 20, // altere para stock_quantity
+        image_path: "strawberry_juice.jpg",
       },
     ],
   });
