@@ -1,3 +1,9 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,60 +13,58 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model employee {
-  id     Int           @id @default(autoincrement())
-  name   String        @db.VarChar(100)
-  role   employee_role
-  orders orders[]
+model Product {
+  id            Int      @id @default(autoincrement())
+  name          String   @db.VarChar(100)
+  price         Decimal  @db.Decimal(10, 2)
+  type          ProductType
+  stockQuantity Int
+  imagePath     String?  @db.VarChar(255)
+  orderProducts OrderProduct[]
 }
 
-model orderproduct {
-  order_id   Int
-  product_id Int
-  quantity   Int
-  orders     orders  @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_order")
-  product    product @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_product")
-
-  @@id([order_id, product_id])
-  @@index([product_id], map: "fk_product")
+model Employee {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(100)
+  role Role
+  orders Orders[]
 }
 
-model orders {
-  id           Int            @id @default(autoincrement())
-  status       orders_status
-  total        Decimal        @db.Decimal(10, 2)
-  employee_id  Int
-  order_date   DateTime?      @default(now()) @db.Timestamp(0)
-  orderproduct orderproduct[]
-  employee     employee       @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee_order")
-
-  @@index([employee_id], map: "fk_employee_order")
+model Orders {
+  id          Int          @id @default(autoincrement())
+  status      OrderStatus
+  total       Decimal       @db.Decimal(10, 2)
+  employeeId  Int
+  orderDate   DateTime      @default(now()) @db.Timestamp(0)
+  employee    Employee      @relation(fields: [employeeId], references: [id])
+  products    OrderProduct[]
 }
 
-model product {
-  id             Int            @id @default(autoincrement())
-  name           String         @db.VarChar(100)
-  price          Decimal        @db.Decimal(10, 2)
-  type           product_type
-  stock_quantity Int
-  image_path     String?        @db.VarChar(255)
-  orderproduct   orderproduct[]
+model OrderProduct {
+  orderId   Int
+  productId Int
+  quantity  Int
+
+  order   Orders  @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@id([orderId, productId])
 }
 
-enum orders_status {
-  in_progress
-  completed
-  canceled
+enum ProductType {
+  food
+  drink
+  dessert
 }
 
-enum employee_role {
+enum Role {
   attendant
   manager
   baker
 }
 
-enum product_type {
-  food
-  drink
-  dessert
+enum OrderStatus {
+  in_progress
+  completed
+  canceled
 }
