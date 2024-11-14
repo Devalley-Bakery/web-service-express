@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { createResponse, ERROR_MESSAGES } from "../error.message.js";
 const prisma = new PrismaClient();
 
 export async function updateProduct(productId, price, quantity) {
@@ -6,11 +7,7 @@ export async function updateProduct(productId, price, quantity) {
         where: { id: parseInt(productId) },
     });
 
-    if (!product) {
-        const error = new Error('Produto não encontrado.')
-        error.status = 404;
-        throw error;
-    }
+    if (!product) return createResponse(404, ERROR_MESSAGES.productNotFound)
 
     const newProduct = {
         price: price ? price : product.price,
@@ -18,10 +15,11 @@ export async function updateProduct(productId, price, quantity) {
     };
 
     try {
-        return await prisma.product.update({
+        const updateProduct =  await prisma.product.update({
             where: { id: parseInt(productId) },
             data: { price: newProduct.price, stockQuantity: newProduct.stockQuantity },
         });
+        return {status: 201, data: updateProduct}
     } catch (error) {
         console.error('Erro ao atualizar o produto:', error);
         error.status = 500;
@@ -30,7 +28,8 @@ export async function updateProduct(productId, price, quantity) {
 }
 
 export async function getProducts() {
-    return await prisma.product.findMany();
+    const products = await prisma.product.findMany();
+    return { status: 200, data: products }
 }
 
 export async function getProductById(productId) {
@@ -38,11 +37,6 @@ export async function getProductById(productId) {
         where: { id: parseInt(productId) },
     });
 
-    if (!product) {
-        const error = new Error('Produto não encontrado.')
-        error.status = 404;
-        throw error;
-    }
-
-    return product;
+    if (!product) return createResponse(404, ERROR_MESSAGES.productNotFound)
+    return { status: 200, data: product };
 }

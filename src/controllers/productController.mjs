@@ -1,23 +1,24 @@
 import * as productService from "../services/productService.mjs";
+import { createResponse, ERROR_MESSAGES } from "../error.message.js";
 
 export async function updateProduct(req, res) {
     const productId = req.params.id;
     const { price, stockQuantity } = req.body;
     if (price === undefined && stockQuantity === undefined) {
-        return res.status(400).json({ message: "Nenhum campo válido enviado para atualização" });
+        return res.status(400).json(createResponse(400, "No valid fields provided for update"));
     }
 
     try {
         const updatedProduct = await productService.updateProduct(productId, price, stockQuantity);
         if (!updatedProduct) {
-            return res.status(404).json({ message: "Produto não encontrado" });
+            return res.status(404).json(createResponse(404, ERROR_MESSAGES.productNotFound));
         }
         res.status(201).json(updatedProduct);
     } catch (error) {
         if (error.status === 404) {
             return res.status(404).json({ message: error.message });
         }
-        return res.status(500).json({ message: 'Erro ao atualizar o produto', error: error.message });
+        return res.status(statusCode).json(createResponse(statusCode, message, { error: error.message }));
     }
 }
 
