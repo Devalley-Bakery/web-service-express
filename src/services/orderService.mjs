@@ -101,15 +101,11 @@ export async function getOrderById(id) {
       price: item.product.price,
     })),
   };
-  return {status: 200, data: orderDetails};
+  return { status: 200, data: orderDetails };
 }
 
-export async function getOrderByStatus(status) {
-  if (!["in_progress", "completed", "canceled"].includes(status))
-    return createResponse(400, ERROR_MESSAGES.invalidStatus);
-
+export async function getAllOrders() {
   const orders = await prisma.orders.findMany({
-    where: { status: status },
     include: {
       products: {
         include: {
@@ -117,6 +113,7 @@ export async function getOrderByStatus(status) {
             select: {
               name: true,
               price: true,
+              imagePath: true,
             },
           },
         },
@@ -135,6 +132,47 @@ export async function getOrderByStatus(status) {
       productName: item.product.name,
       quantity: item.quantity,
       price: item.product.price,
+      imagePath: item.product.imagePath
+    })),
+  }));
+
+  return { status: 200, data: orderDetails };
+
+}
+
+export async function getOrderByStatus(status) {
+  if (!["in_progress", "completed", "canceled"].includes(status))
+    return createResponse(400, ERROR_MESSAGES.invalidStatus);
+
+  const orders = await prisma.orders.findMany({
+    where: { status: status },
+    include: {
+      products: {
+        include: {
+          product: {
+            select: {
+              name: true,
+              price: true,
+              imagePath: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (orders.length === 0) return createResponse(404, ERROR_MESSAGES.orderNotFound);
+
+  const orderDetails = orders.map((order) => ({
+    id: order.id,
+    status: order.status,
+    total: parseFloat(order.total),
+    orderDate: order.orderDate,
+    products: order.products.map((item) => ({
+      productName: item.product.name,
+      quantity: item.quantity,
+      price: item.product.price,
+      imagePath: item.product.imagePath
     })),
   }));
 
@@ -145,7 +183,7 @@ export async function updateOrder(id, status) {
   if (!["in_progress", "completed", "canceled"].includes(status))
     return createResponse(400, ERROR_MESSAGES.invalidStatus);
 
-  const order = await prisma.orders.findUnique({ where: { id: parseInt(id) }});
+  const order = await prisma.orders.findUnique({ where: { id: parseInt(id) } });
 
   if (!order) return createResponse(404, ERROR_MESSAGES.orderNotFound);
 

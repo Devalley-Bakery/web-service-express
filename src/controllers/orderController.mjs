@@ -20,6 +20,15 @@ export async function getOrderById(req, res) {
   }
 }
 
+export async function getAllOrders(req, res) {
+  try {
+    const order = await orderService.getAllOrders();
+    res.status(200).json(order);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 export async function getOrderByStatus(req, res) {
   try {
     const { status } = req.query;
