@@ -2,19 +2,19 @@ import { createResponse, ERROR_MESSAGES } from "../error.message.js";
 import prisma from "../../prisma/index.mjs"
 
 export async function createOrder(employeeId, products) {
-  if( !products || !products.length){
-    return createResponse(404, ERROR_MESSAGES.invalidProucts)
-  }
-  if(!employeeId){
+  if (!employeeId) {
     return createResponse(404, ERROR_MESSAGES.invalidEmployee)
   }
- 
-  const employee = await prisma.employee.findUnique({ where: { id: employeeId } });;
-  if (!employee)  return createResponse(404, ERROR_MESSAGES.employeeNotFound)
 
+  const employee = await prisma.employee.findUnique({ where: { id: employeeId } });;
+  if (!employee) return createResponse(404, ERROR_MESSAGES.employeeNotFound)
+
+  if (!products || !products.length) {
+    return createResponse(404, ERROR_MESSAGES.invalidProucts)
+  }
   const { total, orderProducts, productUpdates } = await calculateOrderDetails(products);
 
-  
+
   const newOrder = await prisma.$transaction(async (tx) => {
     const createdOrder = await tx.orders.create({
       data: {
@@ -40,7 +40,7 @@ export async function calculateOrderDetails(products) {
 
   for (const item of products) {
     const product = await prisma.product.findUnique({ where: { id: item.productId } });
-    if (!product)  throw new Error(ERROR_MESSAGES.orderNotFound);
+    if (!product) throw new Error(ERROR_MESSAGES.orderNotFound);
 
     if (product.stockQuantity < item.quantity) throw new Error(ERROR_MESSAGES.insufficientStock);
 
@@ -127,7 +127,7 @@ export async function getAllOrders() {
     },
   });
 
-  if (orders.length === 0) return createResponse(404, ERROR_MESSAGES.orderNotFound);
+  if (orders.length === 0) return {status: 200, data:[]};
 
   const orderDetails = orders.map((order) => ({
     id: order.id,
@@ -167,7 +167,7 @@ export async function getOrderByStatus(status) {
     },
   });
 
-  if (orders.length === 0) return createResponse(404, ERROR_MESSAGES.orderNotFound);
+  if (orders.length === 0)  return {status: 200, data:[]};
 
   const orderDetails = orders.map((order) => ({
     id: order.id,
