@@ -1,6 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import { createResponse, ERROR_MESSAGES } from "../error.message.js";
-const prisma = new PrismaClient();
+import prisma from "../../prisma/index.mjs"
 
 export async function createOrder(employeeId, products) {
   const employee = await prisma.employee.findUnique({ where: { id: employeeId } });;
@@ -27,7 +26,7 @@ export async function createOrder(employeeId, products) {
   return createResponse(201, "Order created successfully.", newOrder);
 }
 
-async function calculateOrderDetails(products) {
+export async function calculateOrderDetails(products) {
   let total = 0;
   const orderProducts = [];
   const productUpdates = [];

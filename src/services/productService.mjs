@@ -1,6 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import { createResponse, ERROR_MESSAGES } from "../error.message.js";
-const prisma = new PrismaClient();
+import prisma from "../../prisma/index.mjs"
 
 export async function updateProduct(productId, price, quantity) {
     const product = await prisma.product.findUnique({
