@@ -2,6 +2,13 @@ import { createResponse, ERROR_MESSAGES } from "../error.message.js";
 import prisma from "../../prisma/index.mjs"
 
 export async function createOrder(employeeId, products) {
+  if( !products || !products.length){
+    return createResponse(404, ERROR_MESSAGES.invalidProucts)
+  }
+  if(!employeeId){
+    return createResponse(404, ERROR_MESSAGES.invalidEmployee)
+  }
+ 
   const employee = await prisma.employee.findUnique({ where: { id: employeeId } });;
   if (!employee)  return createResponse(404, ERROR_MESSAGES.employeeNotFound)
 

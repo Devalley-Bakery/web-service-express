@@ -1,55 +1,65 @@
-import { createOrder } from "../src/controllers/orderController.mjs";
-import prisma from "../prisma/index.mjs"
 import * as orderService from "../src/services/orderService.mjs";
+import prisma from "../prisma/index.mjs";
 
 jest.mock("../prisma/index.mjs", () => ({
-  employee: {
-    findUnique: jest.fn(),
-  },
-  product: {
-    findUnique: jest.fn(),
-  },
+  employee: { findUnique: jest.fn() },
+  product: { findUnique: jest.fn() },
+  orders: { create: jest.fn() },
   $transaction: jest.fn(),
 }));
 
-// jest.mock("../src/services/orderService.mjs", () => ({
-//   ...jest.requireActual("../src/services/orderService.mjs"), // Manter outras funções reais
-//   calculateOrderDetails: jest.fn(), // Mock de calculateOrderDetails
-// }));
-
-describe("Order Service - Cadastro de Pedido", () => {
+describe("Order Service", () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  test("TC_001 - Deve cadastrar pedido com dados válidos", async () => {
-    // Dados de entrada
-    const mockEmployee = { id: 1, name: "John Doe" };
-    const mockProducts = [
-      { productId: 1, quantity: 2 },
-      { productId: 2, quantity: 3 },
-    ];
-    const mockProductDetails = [
-      { id: 1, price: 10, stockQuantity: 5 },
-      { id: 2, price: 15, stockQuantity: 10 },
-    ];
+  test("TC_001: Cadastrar pedidos com dados válidos", async () => {
+    const employeeId = 1;
+    const products = [{ productId: 1, quantity: 2 }];
+    const employeeMock = { id: 1, name: "Funcionario Teste" };
+    const productMock = { id: 1, price: 10, stockQuantity: 5 };
+    const createdOrderMock = { id: 1, employeeId, total: 20, status: "in_progress" };
 
-    prisma.employee.findUnique.mockResolvedValue(mockEmployee);
-    prisma.product.findUnique
-      .mockImplementationOnce(() => Promise.resolve(mockProductDetails[0]))
-      .mockImplementationOnce(() => Promise.resolve(mockProductDetails[1]));
+    prisma.employee.findUnique.mockResolvedValueOnce(employeeMock);
+    prisma.product.findUnique.mockResolvedValueOnce(productMock);
+    prisma.$transaction.mockResolvedValueOnce(createdOrderMock);
 
-    prisma.$transaction.mockResolvedValue({
-      id: 1,
-      employeeId: mockEmployee.id,
-      total: 65, // (10 * 2) + (15 * 3)
-      status: "in_progress",
-    });
+    const result = await orderService.createOrder(employeeId, products);
 
-    const response = await orderService.createOrder(mockEmployee.id, mockProducts);
+    expect(result.status).toBe(201);
+    expect(result.message).toBe("Order created successfully.");
+    expect(result.data).toEqual(createdOrderMock);
+    expect(prisma.$transaction).toHaveBeenCalledTimes(1);
+  });
 
-    expect(response.status).toBe(201);
-    expect(response.message).toBe("Order created successfully.");
-    expect(response.data.total).toBe(65);
+  it("TC_002: Cadastrar pedidos sem itens selecionados (array vazio)", async () => {
+    const employeeId = 1;
+    const products = [];
+  
+    const employeeMock = { id: 1, name: "Funcionario Teste" };
+  
+    prisma.employee.findUnique.mockResolvedValueOnce(employeeMock);
+  
+    const result = await orderService.createOrder(employeeId, products);
+  
+    expect(result.status).toBe(404);
+    expect(result.message).toBe("Invalid products");
+    expect(result.data).toBe(undefined);
+    expect(prisma.$transaction).not.toHaveBeenCalled();
+  });
+  
+  
+  it("TC_002: Cadastrar pedidos sem itens selecionados (`products` ausente)", async () => {
+    const employeeId = 1;
+  
+    const employeeMock = { id: 1, name: "Funcionario Teste" };
+  
+    prisma.employee.findUnique.mockResolvedValueOnce(employeeMock);
+  
+    const result = await orderService.createOrder(employeeId);
+  
+    expect(result.status).toBe(404);
+    expect(result.message).toBe("Invalid products");
+    expect(prisma.$transaction).not.toHaveBeenCalled();
   });
 });

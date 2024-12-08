@@ -9,4 +9,7 @@ export const ERROR_MESSAGES = {
     invalidStatus: "Invalid status.",
     orderNotFound: "Order not found.",
     orderUpdateError: "Order cannot be updated.",
+    invalidProucts: "Invalid products",
+    invalidEmployee: 'Invalid employees'
+
 };
