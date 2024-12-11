@@ -4,10 +4,14 @@
   "description": "",
   "main": "src/app.mjs",
   "scripts": {
-    "test": "jest",
+    "test": "set NODE_ENV=test && jest",
     "start": "node ./src/app.mjs",
     "start:dev": "nodemon ./src/app.mjs",
-    "seed": "node prisma/seed.mjs"
+    "seed": "node prisma/seed.mjs",
+    "prisma:dev": "npx prisma migrate dev",
+    "prisma:test": "dotenv -e .env.test -- npx prisma migrate dev",
+    "test:setup": "dotenv -e .env.test -- npx prisma migrate reset --force && dotenv -e .env.test -- npm run seed",
+    "studio:test": "dotenv -e .env.test -- npx prisma studio"
   },
   "keywords": [],
   "author": "",
@@ -21,12 +25,15 @@
     "@babel/core": "^7.26.0",
     "@babel/preset-env": "^7.26.0",
     "babel-jest": "^29.7.0",
+    "cross-env": "^7.0.3",
+    "dotenv-cli": "^7.4.4",
     "jest": "^29.7.0",
     "jest-environment-node": "^29.7.0",
     "jest-mock-extended": "^4.0.0-beta1",
     "nodemon": "^3.1.7",
     "prisma": "^5.19.1",
-    "prisma-mock": "^0.10.3"
+    "prisma-mock": "^0.10.3",
+    "supertest": "^7.0.0"
   },
   "type": "module"
 }
